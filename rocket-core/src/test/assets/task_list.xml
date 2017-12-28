@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<task-list>
+    <task name="test1">cn.hikyson.rocket.sample.TestTask1</task>
+    <task name="test2">cn.hikyson.rocket.sample.TestTask2</task>
+    <task name="test3">cn.hikyson.rocket.sample.TestTask3</task>
+    <task name="test4">cn.hikyson.rocket.sample.TestTask4</task>
+    <task name="test5">cn.hikyson.rocket.sample.TestTask5</task>
+</task-list>

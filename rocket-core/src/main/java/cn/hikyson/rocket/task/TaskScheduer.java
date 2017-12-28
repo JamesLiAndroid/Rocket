@@ -1,9 +1,11 @@
-package cn.hikyson.rocket;
+package cn.hikyson.rocket.task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import cn.hikyson.rocket.util.L;
 
 /**
  * Created by kysonchao on 2017/12/27.
@@ -13,34 +15,7 @@ public class TaskScheduer {
 
     public TaskScheduer(List<ConditionTask> originTasks) {
         mTasks = topologicalSort(originTasks);
-        L.d(String.valueOf(mTasks));
-    }
-
-    /**
-     * 任务的有向无环图的拓扑排序
-     *
-     * @return
-     */
-    private List<ConditionTask> topologicalSort(List<ConditionTask> originTasks) {
-        Map<String, ConditionTask> conditionTaskNameMap = new HashMap<>();
-        for (int i = 0; i < originTasks.size(); i++) {
-            ConditionTask task = originTasks.get(i);
-            conditionTaskNameMap.put(task.taskName(), task);
-        }
-        Graph graph = new Graph(originTasks.size());
-        for (int i = 0; i < originTasks.size(); i++) {
-            ConditionTask self = originTasks.get(i);
-            for (String taskName : self.dependsOn()) {
-                int indexOfDepend = originTasks.indexOf(conditionTaskNameMap.get(taskName));
-                graph.addEdge(indexOfDepend, i);
-            }
-        }
-        List<Integer> indexOrder = graph.topologicalSort();
-        List<ConditionTask> allTasksSorted = new ArrayList<>();
-        for (int i : indexOrder) {
-            allTasksSorted.add(originTasks.get(i));
-        }
-        return allTasksSorted;
+        L.d("解析任务依赖关系，" + String.valueOf(mTasks));
     }
 
     public void schedule() {
@@ -81,4 +56,32 @@ public class TaskScheduer {
             }
         }
     }
+
+    /**
+     * 任务的有向无环图的拓扑排序
+     *
+     * @return
+     */
+    private List<ConditionTask> topologicalSort(List<ConditionTask> originTasks) {
+        Map<String, ConditionTask> conditionTaskNameMap = new HashMap<>();
+        for (int i = 0; i < originTasks.size(); i++) {
+            ConditionTask task = originTasks.get(i);
+            conditionTaskNameMap.put(task.taskName(), task);
+        }
+        Graph graph = new Graph(originTasks.size());
+        for (int i = 0; i < originTasks.size(); i++) {
+            ConditionTask self = originTasks.get(i);
+            for (String taskName : self.dependsOn()) {
+                int indexOfDepend = originTasks.indexOf(conditionTaskNameMap.get(taskName));
+                graph.addEdge(indexOfDepend, i);
+            }
+        }
+        List<Integer> indexOrder = graph.topologicalSort();
+        List<ConditionTask> allTasksSorted = new ArrayList<>();
+        for (int i : indexOrder) {
+            allTasksSorted.add(originTasks.get(i));
+        }
+        return allTasksSorted;
+    }
+
 }

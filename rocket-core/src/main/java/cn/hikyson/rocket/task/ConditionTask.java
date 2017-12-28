@@ -1,4 +1,4 @@
-package cn.hikyson.rocket;
+package cn.hikyson.rocket.task;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -42,6 +42,11 @@ public abstract class ConditionTask implements Task, Condition {
 
     @Override
     public String toString() {
-        return taskName();
+        return "ConditionTask{" +
+                "taskName=" + taskName() +
+                " , depends=" + dependsOn() +
+                " , runOn=" + runOn().getClass().getSimpleName() +
+                " , conditionLeft=" + conditionLeft() +
+                '}';
     }
 }
