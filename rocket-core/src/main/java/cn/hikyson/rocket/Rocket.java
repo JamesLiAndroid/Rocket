@@ -4,13 +4,14 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 import cn.hikyson.rocket.parser.TaskParser;
 import cn.hikyson.rocket.task.ConditionTask;
 import cn.hikyson.rocket.task.TailTask;
-import cn.hikyson.rocket.task.TaskCallback;
 import cn.hikyson.rocket.task.TaskScheduer;
 import cn.hikyson.rocket.util.Execs;
 import cn.hikyson.rocket.util.L;
@@ -20,10 +21,20 @@ import cn.hikyson.rocket.util.L;
  * Created by kysonchao on 2017/12/26.
  */
 public class Rocket {
-
     private List<ConditionTask> mConditionTasks;
-
+    private Map<String, ConditionTask> mTaskNameMap;
     private Executor mIoExec;
+
+    private Rocket() {
+    }
+
+    private static class InstanceHolder {
+        private static Rocket sInstance = new Rocket();
+    }
+
+    public static Rocket get() {
+        return InstanceHolder.sInstance;
+    }
 
     public synchronized Rocket from(Context context, String assetFile) throws Throwable {
         return from(TaskParser.parse(context, assetFile));
@@ -55,15 +66,50 @@ public class Rocket {
         };
         mConditionTasks.add(tailTask);
         L.d("原始任务列表: " + String.valueOf(mConditionTasks));
+        mTaskNameMap = new HashMap<>();
+        for (int i = 0; i < mConditionTasks.size(); i++) {
+            ConditionTask task = mConditionTasks.get(i);
+            mTaskNameMap.put(task.taskName(), task);
+        }
         return this;
     }
 
     public synchronized void launch() {
+        if (mConditionTasks == null) {
+            throw new IllegalStateException("init task list first");
+        }
         new TaskScheduer(mConditionTasks).schedule();
     }
 
-    public void listen(String taskName, TaskCallback taskCallback) {
+    /**
+     * 确保任务完成，block直到任务完成
+     *
+     * @param taskName
+     */
+    public synchronized void ensureTask(String taskName) {
+        if (mTaskNameMap == null) {
+            return;
+        }
+        ConditionTask task = mTaskNameMap.get(taskName);
+        if (task == null) {
+            throw new IllegalStateException("can not find task " + taskName);
+        }
+        try {
+            task.waitDone();
+        } catch (InterruptedException e) {
+            L.e(String.valueOf(e));
+        }
+    }
 
+    /**
+     * 确保任务完成，block直到任务完成
+     *
+     * @param taskNames
+     */
+    public synchronized void ensureTasks(String... taskNames) {
+        for (String taskName : taskNames) {
+            ensureTask(taskName);
+        }
     }
 
     public Rocket io(Executor exec) {
