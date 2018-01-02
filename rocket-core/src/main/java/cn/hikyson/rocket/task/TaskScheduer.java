@@ -3,9 +3,7 @@ package cn.hikyson.rocket.task;
 import android.os.SystemClock;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import cn.hikyson.rocket.util.L;
 
@@ -42,36 +40,13 @@ public class TaskScheduer {
                     } catch (Throwable throwable) {
                         throwable.printStackTrace();
                     }
+                    conditionTask.onDone();
                     long doneTime = System.currentTimeMillis();
                     long doneThreadTime = SystemClock.currentThreadTimeMillis();
-                    L.d(conditionTask.taskName() + " run done! " + String.valueOf(new TaskRunTime(waitTime, waitThreadTime, runTime, runThreadTime, doneTime, doneThreadTime)));
+                    L.d(conditionTask.taskName() + " run done! " + String.valueOf(new TaskTimeRecord(waitTime, waitThreadTime, runTime, runThreadTime, doneTime, doneThreadTime)));
                     prepareForChildren(conditionTask);
                 }
             });
-        }
-    }
-
-    private static class TaskRunTime {
-        private long waitDuration;
-        private long waitThreadDuration;
-        private long runDuration;
-        private long runThreadDuration;
-
-        public TaskRunTime(long waitTime, long waitThreadTime, long runTime, long runThreadTime, long doneTime, long doneThreadTime) {
-            waitDuration = runTime - waitTime;
-            waitThreadDuration = runThreadTime - waitThreadTime;
-            runDuration = doneTime - runTime;
-            runThreadDuration = doneThreadTime - runThreadTime;
-        }
-
-        @Override
-        public String toString() {
-            return "TaskRunTime{" +
-                    "waitDuration=" + waitDuration +
-                    "ms, waitThreadDuration=" + waitThreadDuration +
-                    "ms, runDuration=" + runDuration +
-                    "ms, runThreadDuration=" + runThreadDuration +
-                    "ms}";
         }
     }
 
@@ -94,17 +69,16 @@ public class TaskScheduer {
      *
      * @return
      */
-    private List<ConditionTask> topologicalSort(List<ConditionTask> originTasks) {
-        Map<String, ConditionTask> conditionTaskNameMap = new HashMap<>();
-        for (int i = 0; i < originTasks.size(); i++) {
-            ConditionTask task = originTasks.get(i);
-            conditionTaskNameMap.put(task.taskName(), task);
-        }
+    private synchronized List<ConditionTask> topologicalSort(List<ConditionTask> originTasks) {
+
         Graph graph = new Graph(originTasks.size());
         for (int i = 0; i < originTasks.size(); i++) {
             ConditionTask self = originTasks.get(i);
             for (String taskName : self.dependsOn()) {
-                int indexOfDepend = originTasks.indexOf(conditionTaskNameMap.get(taskName));
+                int indexOfDepend = getIndexOfTask(originTasks, taskName);
+                if (indexOfDepend < 0) {
+                    throw new IllegalStateException(self.taskName() + "depends on " + taskName + " can not be found in task list");
+                }
                 graph.addEdge(indexOfDepend, i);
             }
         }
@@ -114,6 +88,47 @@ public class TaskScheduer {
             allTasksSorted.add(originTasks.get(i));
         }
         return allTasksSorted;
+    }
+
+    /**
+     * 获取任务在任务列表中的index
+     *
+     * @param originTasks
+     * @param taskName
+     * @return
+     */
+    private int getIndexOfTask(List<ConditionTask> originTasks, String taskName) {
+        final int size = originTasks.size();
+        for (int i = 0; i < size; i++) {
+            if (taskName.equals(originTasks.get(i).taskName())) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static class TaskTimeRecord {
+        private long waitDuration;
+        private long waitThreadDuration;
+        private long runDuration;
+        private long runThreadDuration;
+
+        public TaskTimeRecord(long waitTime, long waitThreadTime, long runTime, long runThreadTime, long doneTime, long doneThreadTime) {
+            waitDuration = runTime - waitTime;
+            waitThreadDuration = runThreadTime - waitThreadTime;
+            runDuration = doneTime - runTime;
+            runThreadDuration = doneThreadTime - runThreadTime;
+        }
+
+        @Override
+        public String toString() {
+            return "TaskTimeRecord{" +
+                    "waitDuration=" + waitDuration +
+                    "ms, waitThreadDuration=" + waitThreadDuration +
+                    "ms, runDuration=" + runDuration +
+                    "ms, runThreadDuration=" + runThreadDuration +
+                    "ms}";
+        }
     }
 
 }

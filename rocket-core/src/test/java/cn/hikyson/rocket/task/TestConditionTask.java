@@ -15,10 +15,6 @@ public abstract class TestConditionTask extends ConditionTask {
 
     @Override
     public void run() throws Throwable {
-        mTaskCallback.taskStart();
         Thread.sleep(mRunTime);
-        mTaskCallback.taskEnd();
     }
-
-
 }
