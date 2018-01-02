@@ -1,5 +1,7 @@
 package cn.hikyson.rocket.task;
 
+import android.support.annotation.NonNull;
+
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -12,6 +14,7 @@ public interface Task {
      *
      * @return
      */
+    @NonNull
     String taskName();
 
     /**
@@ -24,6 +27,7 @@ public interface Task {
      *
      * @return
      */
+    @NonNull
     List<String> dependsOn();
 
     /**
@@ -31,5 +35,6 @@ public interface Task {
      *
      * @return
      */
+    @NonNull
     Executor runOn();
 }

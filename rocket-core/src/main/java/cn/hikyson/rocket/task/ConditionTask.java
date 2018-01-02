@@ -1,15 +1,25 @@
 package cn.hikyson.rocket.task;
 
+import android.support.annotation.Keep;
+import android.support.annotation.NonNull;
+
 import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by kysonchao on 2017/12/26.
  */
+@Keep
 public abstract class ConditionTask implements Task, Condition {
     private CountDownLatch mCountDownLatch;
 
     public ConditionTask() {
         mCountDownLatch = new CountDownLatch(dependsOn().size());
+    }
+
+    @NonNull
+    @Override
+    public String taskName() {
+        return getClass().getSimpleName();
     }
 
     /**
