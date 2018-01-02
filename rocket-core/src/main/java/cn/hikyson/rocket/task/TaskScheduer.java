@@ -1,5 +1,7 @@
 package cn.hikyson.rocket.task;
 
+import android.os.SystemClock;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,23 +25,53 @@ public class TaskScheduer {
             conditionTask.runOn().execute(new Runnable() {
                 @Override
                 public void run() {
-                    L.d(conditionTask.taskName() + " 共有" + conditionTask.conditionLeft() + "前置条件");
+                    L.d(conditionTask.taskName() + " 还有" + conditionTask.conditionLeft() + "前置条件");
                     L.d(conditionTask.taskName() + " 等待条件允许...");
+                    long waitTime = System.currentTimeMillis();
+                    long waitThreadTime = SystemClock.currentThreadTimeMillis();
                     try {
                         conditionTask.waitMetCondition();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    long runTime = System.currentTimeMillis();
+                    long runThreadTime = SystemClock.currentThreadTimeMillis();
                     L.d(conditionTask.taskName() + " 条件满足，正在run...");
                     try {
                         conditionTask.run();
                     } catch (Throwable throwable) {
                         throwable.printStackTrace();
                     }
-                    L.d(conditionTask.taskName() + " run 完了.");
+                    long doneTime = System.currentTimeMillis();
+                    long doneThreadTime = SystemClock.currentThreadTimeMillis();
+                    L.d(conditionTask.taskName() + " run done! " + String.valueOf(new TaskRunTime(waitTime, waitThreadTime, runTime, runThreadTime, doneTime, doneThreadTime)));
                     prepareForChildren(conditionTask);
                 }
             });
+        }
+    }
+
+    private static class TaskRunTime {
+        private long waitDuration;
+        private long waitThreadDuration;
+        private long runDuration;
+        private long runThreadDuration;
+
+        public TaskRunTime(long waitTime, long waitThreadTime, long runTime, long runThreadTime, long doneTime, long doneThreadTime) {
+            waitDuration = runTime - waitTime;
+            waitThreadDuration = runThreadTime - waitThreadTime;
+            runDuration = doneTime - runTime;
+            runThreadDuration = doneThreadTime - runThreadTime;
+        }
+
+        @Override
+        public String toString() {
+            return "TaskRunTime{" +
+                    "waitDuration=" + waitDuration +
+                    "ms, waitThreadDuration=" + waitThreadDuration +
+                    "ms, runDuration=" + runDuration +
+                    "ms, runThreadDuration=" + runThreadDuration +
+                    "ms}";
         }
     }
 

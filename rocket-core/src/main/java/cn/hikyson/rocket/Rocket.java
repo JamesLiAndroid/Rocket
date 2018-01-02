@@ -8,6 +8,7 @@ import java.util.List;
 import cn.hikyson.rocket.parser.TaskParser;
 import cn.hikyson.rocket.task.ConditionTask;
 import cn.hikyson.rocket.task.TailTask;
+import cn.hikyson.rocket.task.TaskCallback;
 import cn.hikyson.rocket.task.TaskScheduer;
 import cn.hikyson.rocket.util.L;
 
@@ -44,6 +45,10 @@ public class Rocket {
 
     public synchronized void launch() {
         new TaskScheduer(mConditionTasks).schedule();
+    }
+
+    public void listen(String taskName, TaskCallback taskCallback) {
+
     }
 
     private interface TaskFilter {

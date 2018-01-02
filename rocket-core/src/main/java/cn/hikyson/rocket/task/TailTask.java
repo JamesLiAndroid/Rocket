@@ -24,6 +24,6 @@ public abstract class TailTask extends ConditionTask {
 
     @Override
     public Executor runOn() {
-        return Execs.MAIN_EXECUTOR;
+        return Execs.SINGLE;
     }
 }
