@@ -1,6 +1,7 @@
 package cn.hikyson.rocket;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public class Rocket {
     public synchronized Rocket from(final List<ConditionTask> conditionTasks) {
         mConditionTasks = new ArrayList<>(conditionTasks);
         TailTask tailTask = new TailTask() {
+            @NonNull
             @Override
             public List<String> dependsOn() {
                 //如果用户任务依赖尾部任务，那么尾部任务就不依赖该用户
@@ -42,6 +44,7 @@ public class Rocket {
                 });
             }
 
+            @NonNull
             @Override
             public Executor runOn() {
                 if (mIoExec == null) {
