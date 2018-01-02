@@ -7,6 +7,14 @@ import java.util.concurrent.Executors;
  * Created by kysonchao on 2018/1/2.
  */
 public class Execs {
-    public static Executor MAIN_EXECUTOR = new MainThreadExecutor();
-    public static Executor SINGLE = Executors.newSingleThreadExecutor();
+    private static Executor sMain = new MainThreadExecutor();
+    private static Executor sIo;
+    private static Executor sSingle = Executors.newSingleThreadExecutor();
+
+    public static Executor io() {
+        if (sIo == null) {
+            sIo = Executors.newCachedThreadPool();
+        }
+        return sIo;
+    }
 }
