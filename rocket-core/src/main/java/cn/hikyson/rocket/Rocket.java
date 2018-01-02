@@ -4,12 +4,14 @@ import android.content.Context;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import cn.hikyson.rocket.parser.TaskParser;
 import cn.hikyson.rocket.task.ConditionTask;
 import cn.hikyson.rocket.task.TailTask;
 import cn.hikyson.rocket.task.TaskCallback;
 import cn.hikyson.rocket.task.TaskScheduer;
+import cn.hikyson.rocket.util.Execs;
 import cn.hikyson.rocket.util.L;
 
 /**
@@ -19,6 +21,8 @@ import cn.hikyson.rocket.util.L;
 public class Rocket {
 
     private List<ConditionTask> mConditionTasks;
+
+    private Executor mIoExec;
 
     public synchronized Rocket from(Context context, String assetFile) throws Throwable {
         return from(TaskParser.parse(context, assetFile));
@@ -37,6 +41,14 @@ public class Rocket {
                     }
                 });
             }
+
+            @Override
+            public Executor runOn() {
+                if (mIoExec == null) {
+                    return Execs.io();
+                }
+                return mIoExec;
+            }
         };
         mConditionTasks.add(tailTask);
         L.d("原始任务列表: " + String.valueOf(mConditionTasks));
@@ -49,6 +61,11 @@ public class Rocket {
 
     public void listen(String taskName, TaskCallback taskCallback) {
 
+    }
+
+    public Rocket io(Executor exec) {
+        mIoExec = exec;
+        return this;
     }
 
     private interface TaskFilter {
