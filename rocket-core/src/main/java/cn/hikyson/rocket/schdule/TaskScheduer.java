@@ -26,6 +26,7 @@ public class TaskScheduer {
                 public void run() {
                     L.d(conditionTask.taskName() + " 还有" + conditionTask.conditionLeft() + "前置条件");
                     L.d(conditionTask.taskName() + " 等待条件允许...");
+                    Thread.currentThread().setPriority(conditionTask.priority());
                     long waitTime = System.currentTimeMillis();
                     long waitThreadTime = SystemClock.currentThreadTimeMillis();
                     try {
