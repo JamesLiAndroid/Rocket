@@ -15,7 +15,7 @@ import cn.hikyson.rocket.parser.TaskParser;
 import cn.hikyson.rocket.task.ConditionTask;
 import cn.hikyson.rocket.task.ITailTask;
 import cn.hikyson.rocket.task.TailTask;
-import cn.hikyson.rocket.task.TaskScheduer;
+import cn.hikyson.rocket.schdule.TaskScheduer;
 import cn.hikyson.rocket.util.L;
 
 /**

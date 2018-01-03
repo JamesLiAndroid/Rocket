@@ -1,4 +1,6 @@
-package cn.hikyson.rocket.task;
+package cn.hikyson.rocket.schdule;
+
+import cn.hikyson.rocket.task.ConditionTask;
 
 /**
  * Created by kysonchao on 2018/1/2.
