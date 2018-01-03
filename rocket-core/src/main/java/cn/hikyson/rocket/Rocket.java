@@ -2,6 +2,7 @@ package cn.hikyson.rocket;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,9 +12,9 @@ import java.util.concurrent.Executor;
 
 import cn.hikyson.rocket.parser.TaskParser;
 import cn.hikyson.rocket.task.ConditionTask;
+import cn.hikyson.rocket.task.ITailTask;
 import cn.hikyson.rocket.task.TailTask;
 import cn.hikyson.rocket.task.TaskScheduer;
-import cn.hikyson.rocket.util.Execs;
 import cn.hikyson.rocket.util.L;
 
 /**
@@ -23,7 +24,8 @@ import cn.hikyson.rocket.util.L;
 public class Rocket {
     private List<ConditionTask> mConditionTasks;
     private Map<String, ConditionTask> mTaskNameMap;
-    private Executor mIoExec;
+    //    private Executor mIoExec;
+    private ITailTask mITailTask;
 
     private Rocket() {
     }
@@ -42,29 +44,38 @@ public class Rocket {
 
     public synchronized Rocket from(final List<ConditionTask> conditionTasks) {
         mConditionTasks = new ArrayList<>(conditionTasks);
-        TailTask tailTask = new TailTask() {
-            @NonNull
-            @Override
-            public List<String> dependsOn() {
-                //如果用户任务依赖尾部任务，那么尾部任务就不依赖该用户
-                return parseTaskNames(conditionTasks, new TaskFilter() {
-                    @Override
-                    public boolean filter(ConditionTask task) {
-                        return !task.dependsOn().contains(TailTask.class.getSimpleName());
-                    }
-                });
-            }
-
-            @NonNull
-            @Override
-            public Executor runOn() {
-                if (mIoExec == null) {
-                    return Execs.io();
+        if (mITailTask != null) {
+            TailTask tailTask = new TailTask() {
+                @NonNull
+                @Override
+                public List<String> dependsOn() {
+                    //如果用户任务依赖尾部任务，那么尾部任务就不依赖该用户
+                    return parseTaskNames(conditionTasks, new TaskFilter() {
+                        @Override
+                        public boolean filter(ConditionTask task) {
+                            return !task.dependsOn().contains(TailTask.class.getSimpleName());
+                        }
+                    });
                 }
-                return mIoExec;
-            }
-        };
-        mConditionTasks.add(tailTask);
+
+                @NonNull
+                @Override
+                public String taskName() {
+                    if (TextUtils.isEmpty(mITailTask.taskName())) {
+                        return super.taskName();
+                    }
+                    //noinspection ConstantConditions
+                    return mITailTask.taskName();
+                }
+
+                @NonNull
+                @Override
+                public Executor runOn() {
+                    return mITailTask.runOn();
+                }
+            };
+            mConditionTasks.add(tailTask);
+        }
         L.d("原始任务列表: " + String.valueOf(mConditionTasks));
         mTaskNameMap = new HashMap<>();
         for (int i = 0; i < mConditionTasks.size(); i++) {
@@ -112,10 +123,21 @@ public class Rocket {
         }
     }
 
-    public Rocket io(Executor exec) {
-        mIoExec = exec;
+    /**
+     * 配置尾部task
+     *
+     * @param iTailTask
+     * @return
+     */
+    public Rocket tailTask(ITailTask iTailTask) {
+        this.mITailTask = iTailTask;
         return this;
     }
+
+//    public Rocket io(Executor exec) {
+//        mIoExec = exec;
+//        return this;
+//    }
 
     private interface TaskFilter {
         boolean filter(ConditionTask task);
