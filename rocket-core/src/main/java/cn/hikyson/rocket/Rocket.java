@@ -97,7 +97,7 @@ public class Rocket {
      *
      * @param taskName
      */
-    public static synchronized void ensureTask(String taskName) {
+    public static void ensureTask(String taskName) {
         Map<String, ConditionTask> taskNameMap = Rocket.get().mTaskNameMap;
         if (taskNameMap == null) {
             return;
@@ -118,7 +118,7 @@ public class Rocket {
      *
      * @param taskNames
      */
-    public static synchronized void ensureTasks(String... taskNames) {
+    public static void ensureTasks(String... taskNames) {
         for (String taskName : taskNames) {
             ensureTask(taskName);
         }
