@@ -12,7 +12,7 @@ import cn.hikyson.rocket.util.L;
  * Created by kysonchao on 2017/12/26.
  */
 @Keep
-public abstract class ConditionTask implements Task, Condition, Dependecy, Priority {
+public abstract class ConditionTask implements Task, Condition, Dependecy {
     //task依赖其他task的条件锁
     private CountDownLatch mDependencyLatch;
     //task被其他模块依赖的条件锁
@@ -67,11 +67,6 @@ public abstract class ConditionTask implements Task, Condition, Dependecy, Prior
         if (!mBedependencyLatch.await(5, TimeUnit.SECONDS)) {
             L.e("Wait [" + taskName() + "] done timeout");
         }
-    }
-
-    @Override
-    public int priority() {
-        return Thread.NORM_PRIORITY;
     }
 
     @Override
