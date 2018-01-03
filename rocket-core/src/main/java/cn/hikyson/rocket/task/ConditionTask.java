@@ -4,9 +4,6 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import cn.hikyson.rocket.util.L;
 
 /**
  * Created by kysonchao on 2017/12/26.
@@ -64,9 +61,7 @@ public abstract class ConditionTask implements Task, Condition, Dependecy, Prior
 
     @Override
     public void waitDone() throws InterruptedException {
-        if (!mBedependencyLatch.await(5, TimeUnit.SECONDS)) {
-            L.e("Wait [" + taskName() + "] done timeout");
-        }
+        mBedependencyLatch.await();
     }
 
     @Override
