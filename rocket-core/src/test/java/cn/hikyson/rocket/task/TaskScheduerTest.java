@@ -14,6 +14,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import cn.hikyson.rocket.BuildConfig;
+import cn.hikyson.rocket.schdule.*;
 
 /**
  * Created by kysonchao on 2017/12/28.
@@ -27,7 +28,7 @@ public class TaskScheduerTest {
         final CountDownLatch downLatch = new CountDownLatch(4);
         final long[] taskStartTime = {0, 0};
         final long[] taskEndTime = {0, 0};
-        ConditionTask task0 = TaskFactory.create("task0", 1000, new ArrayList<String>(), executor, new TaskCallback() {
+        ConditionTask task0 = TaskFactory.create("task0", 1000, new ArrayList<String>(), executor, new cn.hikyson.rocket.schdule.TaskCallback() {
             @Override
             public void taskStart() {
                 taskStartTime[0] = System.nanoTime();
@@ -40,7 +41,7 @@ public class TaskScheduerTest {
                 downLatch.countDown();
             }
         });
-        ConditionTask task1 = TaskFactory.create("task1", 1000, Collections.singletonList("task0"), executor, new TaskCallback() {
+        ConditionTask task1 = TaskFactory.create("task1", 1000, Collections.singletonList("task0"), executor, new cn.hikyson.rocket.schdule.TaskCallback() {
             @Override
             public void taskStart() {
                 taskStartTime[1] = System.nanoTime();
@@ -66,7 +67,7 @@ public class TaskScheduerTest {
         final CountDownLatch downLatch = new CountDownLatch(6);
         final long[] taskStartTime = {0, 0, 0};
         final long[] taskEndTime = {0, 0, 0};
-        ConditionTask task0 = TaskFactory.create("task0", 1000, new ArrayList<String>(), executor, new TaskCallback() {
+        ConditionTask task0 = TaskFactory.create("task0", 1000, new ArrayList<String>(), executor, new cn.hikyson.rocket.schdule.TaskCallback() {
             @Override
             public void taskStart() {
                 taskStartTime[0] = System.nanoTime();
@@ -79,7 +80,7 @@ public class TaskScheduerTest {
                 downLatch.countDown();
             }
         });
-        ConditionTask task1 = TaskFactory.create("task1", 1000, Collections.singletonList("task0"), executor, new TaskCallback() {
+        ConditionTask task1 = TaskFactory.create("task1", 1000, Collections.singletonList("task0"), executor, new cn.hikyson.rocket.schdule.TaskCallback() {
             @Override
             public void taskStart() {
                 taskStartTime[1] = System.nanoTime();
@@ -92,7 +93,7 @@ public class TaskScheduerTest {
                 downLatch.countDown();
             }
         });
-        ConditionTask task2 = TaskFactory.create("task2", 1000, Collections.singletonList("task0"), executor, new TaskCallback() {
+        ConditionTask task2 = TaskFactory.create("task2", 1000, Collections.singletonList("task0"), executor, new cn.hikyson.rocket.schdule.TaskCallback() {
             @Override
             public void taskStart() {
                 taskStartTime[2] = System.nanoTime();
@@ -118,7 +119,7 @@ public class TaskScheduerTest {
         final CountDownLatch downLatch = new CountDownLatch(6);
         final long[] taskStartTime = {0, 0, 0};
         final long[] taskEndTime = {0, 0, 0};
-        ConditionTask task0 = TaskFactory.create("task0", 1000, new ArrayList<String>(), executor, new TaskCallback() {
+        ConditionTask task0 = TaskFactory.create("task0", 1000, new ArrayList<String>(), executor, new cn.hikyson.rocket.schdule.TaskCallback() {
             @Override
             public void taskStart() {
                 taskStartTime[0] = System.nanoTime();
@@ -131,7 +132,7 @@ public class TaskScheduerTest {
                 downLatch.countDown();
             }
         });
-        ConditionTask task1 = TaskFactory.create("task1", 1000, Collections.singletonList("task0"), executor, new TaskCallback() {
+        ConditionTask task1 = TaskFactory.create("task1", 1000, Collections.singletonList("task0"), executor, new cn.hikyson.rocket.schdule.TaskCallback() {
             @Override
             public void taskStart() {
                 taskStartTime[1] = System.nanoTime();
@@ -144,7 +145,7 @@ public class TaskScheduerTest {
                 downLatch.countDown();
             }
         });
-        ConditionTask task2 = TaskFactory.create("task2", 1000, Arrays.asList("task0", "task1"), executor, new TaskCallback() {
+        ConditionTask task2 = TaskFactory.create("task2", 1000, Arrays.asList("task0", "task1"), executor, new cn.hikyson.rocket.schdule.TaskCallback() {
             @Override
             public void taskStart() {
                 taskStartTime[2] = System.nanoTime();
@@ -168,7 +169,7 @@ public class TaskScheduerTest {
     @Test
     public void schedule4() throws Exception {
         final Executor executor = Executors.newCachedThreadPool();
-        ConditionTask task0 = TaskFactory.create("task0", 1000, Collections.singletonList("task2"), executor, new TaskCallback() {
+        ConditionTask task0 = TaskFactory.create("task0", 1000, Collections.singletonList("task2"), executor, new cn.hikyson.rocket.schdule.TaskCallback() {
             @Override
             public void taskStart() {
             }
@@ -177,7 +178,7 @@ public class TaskScheduerTest {
             public void taskEnd() {
             }
         });
-        ConditionTask task1 = TaskFactory.create("task1", 1000, Collections.singletonList("task0"), executor, new TaskCallback() {
+        ConditionTask task1 = TaskFactory.create("task1", 1000, Collections.singletonList("task0"), executor, new cn.hikyson.rocket.schdule.TaskCallback() {
             @Override
             public void taskStart() {
             }
@@ -186,7 +187,7 @@ public class TaskScheduerTest {
             public void taskEnd() {
             }
         });
-        ConditionTask task2 = TaskFactory.create("task2", 1000, Collections.singletonList("task1"), executor, new TaskCallback() {
+        ConditionTask task2 = TaskFactory.create("task2", 1000, Collections.singletonList("task1"), executor, new cn.hikyson.rocket.schdule.TaskCallback() {
             @Override
             public void taskStart() {
             }

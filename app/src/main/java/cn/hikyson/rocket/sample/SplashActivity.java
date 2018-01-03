@@ -18,7 +18,7 @@ public class SplashActivity extends AppCompatActivity {
     public void test(View view) {
         Toast.makeText(SplashActivity.this, "running...", Toast.LENGTH_LONG).show();
         try {
-            new Rocket().from(SplashActivity.this, "rocket/task_list.xml").launch();
+            Rocket.get().from(SplashActivity.this, "rocket/task_list.xml").launch();
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
