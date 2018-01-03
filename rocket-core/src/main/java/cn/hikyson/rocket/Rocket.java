@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,6 @@ import cn.hikyson.rocket.util.L;
 public class Rocket {
     private List<ConditionTask> mConditionTasks;
     private Map<String, ConditionTask> mTaskNameMap;
-    //    private Executor mIoExec;
     private ITailTask mITailTask;
 
     private Rocket() {
@@ -77,7 +77,7 @@ public class Rocket {
             mConditionTasks.add(tailTask);
         }
         L.d("原始任务列表: " + String.valueOf(mConditionTasks));
-        mTaskNameMap = new HashMap<>();
+        mTaskNameMap = Collections.synchronizedMap(new HashMap<String,ConditionTask>());
         for (int i = 0; i < mConditionTasks.size(); i++) {
             ConditionTask task = mConditionTasks.get(i);
             mTaskNameMap.put(task.taskName(), task);
@@ -97,11 +97,12 @@ public class Rocket {
      *
      * @param taskName
      */
-    public synchronized void ensureTask(String taskName) {
-        if (mTaskNameMap == null) {
+    public static void ensureTask(String taskName) {
+        Map<String, ConditionTask> taskNameMap = Rocket.get().mTaskNameMap;
+        if (taskNameMap == null) {
             return;
         }
-        ConditionTask task = mTaskNameMap.get(taskName);
+        ConditionTask task = taskNameMap.get(taskName);
         if (task == null) {
             throw new IllegalStateException("can not find task " + taskName);
         }
@@ -117,7 +118,7 @@ public class Rocket {
      *
      * @param taskNames
      */
-    public synchronized void ensureTasks(String... taskNames) {
+    public static void ensureTasks(String... taskNames) {
         for (String taskName : taskNames) {
             ensureTask(taskName);
         }
@@ -133,11 +134,6 @@ public class Rocket {
         this.mITailTask = iTailTask;
         return this;
     }
-
-//    public Rocket io(Executor exec) {
-//        mIoExec = exec;
-//        return this;
-//    }
 
     private interface TaskFilter {
         boolean filter(ConditionTask task);

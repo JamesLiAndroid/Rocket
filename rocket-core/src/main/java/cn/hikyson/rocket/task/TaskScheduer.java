@@ -70,7 +70,6 @@ public class TaskScheduer {
      * @return
      */
     private synchronized List<ConditionTask> topologicalSort(List<ConditionTask> originTasks) {
-
         Graph graph = new Graph(originTasks.size());
         for (int i = 0; i < originTasks.size(); i++) {
             ConditionTask self = originTasks.get(i);
