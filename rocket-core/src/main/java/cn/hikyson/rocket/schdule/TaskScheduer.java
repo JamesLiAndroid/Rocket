@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.hikyson.rocket.task.ConditionTask;
-import cn.hikyson.rocket.task.PriorityRunnable;
 import cn.hikyson.rocket.util.L;
 
 /**
@@ -22,7 +21,7 @@ public class TaskScheduer {
 
     public void schedule() {
         for (final ConditionTask conditionTask : mTasks) {
-            conditionTask.runOn().execute(new PriorityRunnable(conditionTask.priority()) {
+            conditionTask.runOn().execute(new Runnable() {
                 @Override
                 public void run() {
                     L.d(conditionTask.taskName() + " 还有" + conditionTask.conditionLeft() + "前置条件");
