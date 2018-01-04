@@ -1,2 +1,4 @@
 # Rocket
-Android app启动时间优化框架
+
+Framework for shorten android app startup time
+

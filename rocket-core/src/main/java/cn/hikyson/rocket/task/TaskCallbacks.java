@@ -1,4 +1,4 @@
-package cn.hikyson.rocket.schdule;
+package cn.hikyson.rocket.task;
 
 
 import android.support.v4.util.ArrayMap;
@@ -6,6 +6,8 @@ import android.support.v4.util.ArrayMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import cn.hikyson.rocket.task.TaskCallback;
 
 /**
  * Created by kysonchao on 2018/1/2.

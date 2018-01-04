@@ -4,29 +4,20 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import cn.hikyson.rocket.util.L;
 
 /**
  * Created by kysonchao on 2017/12/26.
  */
 @Keep
-public abstract class ConditionTask implements Task, Condition, Dependecy, Priority {
+public abstract class LaunchTask implements Task, Condition, Dependecy, Priority, TaskCallback {
     //task依赖其他task的条件锁
     private CountDownLatch mDependencyLatch;
     //task被其他模块依赖的条件锁
     private CountDownLatch mBedependencyLatch;
 
-    public ConditionTask() {
+    public LaunchTask() {
         mDependencyLatch = new CountDownLatch(dependsOn().size());
         mBedependencyLatch = new CountDownLatch(1);
-    }
-
-    @NonNull
-    @Override
-    public String taskName() {
-        return getClass().getSimpleName();
     }
 
     /**
@@ -35,7 +26,7 @@ public abstract class ConditionTask implements Task, Condition, Dependecy, Prior
      * @throws InterruptedException
      */
     @Override
-    public void waitMetCondition() throws InterruptedException {
+    public final void waitMetCondition() throws InterruptedException {
         mDependencyLatch.await();
     }
 
@@ -43,7 +34,7 @@ public abstract class ConditionTask implements Task, Condition, Dependecy, Prior
      * 前置条件准备
      */
     @Override
-    public void conditionPrepare() {
+    public final void conditionPrepare() {
         mDependencyLatch.countDown();
     }
 
@@ -53,25 +44,41 @@ public abstract class ConditionTask implements Task, Condition, Dependecy, Prior
      * @return
      */
     @Override
-    public long conditionLeft() {
+    public final long conditionLeft() {
         return mDependencyLatch.getCount();
     }
 
     @Override
-    public void onDone() {
+    public final void dependencyUnlock() {
         mBedependencyLatch.countDown();
     }
 
     @Override
-    public void waitDone() throws InterruptedException {
-        if (!mBedependencyLatch.await(5, TimeUnit.SECONDS)) {
-            L.e("Wait [" + taskName() + "] done timeout");
-        }
+    public final void dependencyWait() throws InterruptedException {
+        mBedependencyLatch.await();
+    }
+
+    @NonNull
+    @Override
+    public String taskName() {
+        return getClass().getSimpleName();
     }
 
     @Override
     public int priority() {
         return Thread.NORM_PRIORITY;
+    }
+
+    @Override
+    public void beforeWait(){
+    }
+
+    @Override
+    public void beforeRun(){
+    }
+
+    @Override
+    public void onTaskDone(){
     }
 
     @Override

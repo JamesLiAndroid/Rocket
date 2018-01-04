@@ -1,4 +1,4 @@
-package cn.hikyson.rocket.schdule;
+package cn.hikyson.rocket.task;
 
 
 import java.util.ArrayList;
@@ -65,7 +65,7 @@ public class Graph {
             cnt++;
         }
         if (cnt != mVerticeCount) {//检查是否有环
-            throw new IllegalStateException("exists a cycle in the graph");
+            throw new IllegalStateException("Exists a cycle in the graph");
         }
         return topOrder;
     }
