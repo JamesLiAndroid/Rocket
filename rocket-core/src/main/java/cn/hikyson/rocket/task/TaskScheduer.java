@@ -44,8 +44,9 @@ public class TaskScheduer {
                     task.dependencyUnlock();
                     long doneTime = System.currentTimeMillis();
                     long doneThreadTime = SystemClock.currentThreadTimeMillis();
-                    L.d(task.taskName() + " run done! " + String.valueOf(new TaskTimeRecord(waitTime, runTime, runThreadTime, doneTime, doneThreadTime)));
-                    task.onTaskDone();
+                    TaskRecord taskRecord = new TaskRecord(waitTime, runTime, runThreadTime, doneTime, doneThreadTime);
+                    L.d(task.taskName() + " run done! " + String.valueOf(taskRecord));
+                    task.onTaskDone(taskRecord);
                     prepareForChildren(task);
                 }
             });
@@ -106,26 +107,5 @@ public class TaskScheduer {
             }
         }
         return -1;
-    }
-
-    private static class TaskTimeRecord {
-        private long waitDuration;
-        private long runDuration;
-        private long runThreadDuration;
-
-        TaskTimeRecord(long waitTime, long runTime, long runThreadTime, long doneTime, long doneThreadTime) {
-            waitDuration = runTime - waitTime;
-            runDuration = doneTime - runTime;
-            runThreadDuration = doneThreadTime - runThreadTime;
-        }
-
-        @Override
-        public String toString() {
-            return "TaskTimeRecord{" +
-                    "waitDuration=" + waitDuration +
-                    "ms, runDuration=" + runDuration +
-                    "ms, runThreadDuration=" + runThreadDuration +
-                    "ms}";
-        }
     }
 }

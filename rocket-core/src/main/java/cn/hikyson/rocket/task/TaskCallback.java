@@ -11,5 +11,5 @@ public interface TaskCallback {
     void beforeRun();
 
     //任务执行完毕
-    void onTaskDone();
+    void onTaskDone(TaskRecord taskRecord);
 }

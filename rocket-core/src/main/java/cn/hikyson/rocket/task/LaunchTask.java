@@ -70,15 +70,15 @@ public abstract class LaunchTask implements Task, Condition, Dependecy, Priority
     }
 
     @Override
-    public void beforeWait(){
+    public void beforeWait() {
     }
 
     @Override
-    public void beforeRun(){
+    public void beforeRun() {
     }
 
     @Override
-    public void onTaskDone(){
+    public void onTaskDone(TaskRecord taskRecord) {
     }
 
     @Override
