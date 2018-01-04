@@ -15,6 +15,7 @@ import cn.hikyson.rocket.parser.TaskParser;
 import cn.hikyson.rocket.task.ITailTask;
 import cn.hikyson.rocket.task.LaunchTask;
 import cn.hikyson.rocket.task.TailTask;
+import cn.hikyson.rocket.task.TaskRecord;
 import cn.hikyson.rocket.task.TaskScheduer;
 import cn.hikyson.rocket.util.L;
 
@@ -158,8 +159,8 @@ public class Rocket {
             }
 
             @Override
-            public void onTaskDone() {
-                iTailTask.onTaskDone();
+            public void onTaskDone(TaskRecord taskRecord) {
+                iTailTask.onTaskDone(taskRecord);
             }
         };
     }
