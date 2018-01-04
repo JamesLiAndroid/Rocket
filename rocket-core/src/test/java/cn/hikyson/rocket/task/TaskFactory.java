@@ -9,7 +9,7 @@ import java.util.concurrent.Executor;
  * Created by kysonchao on 2017/12/28.
  */
 public class TaskFactory {
-    public static ConditionTask create(final String taskName, long runTime, final List<String> depends, final Executor executor, cn.hikyson.rocket.schdule.TaskCallback taskCallback) {
+    public static LaunchTask create(final String taskName, long runTime, final List<String> depends, final Executor executor, TaskCallback taskCallback) {
         return new TestConditionTask(taskCallback, runTime) {
             @NonNull
             @Override

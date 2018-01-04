@@ -1,52 +1,52 @@
-package cn.hikyson.rocket.schdule;
+package cn.hikyson.rocket.task;
 
 import android.os.SystemClock;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.hikyson.rocket.task.ConditionTask;
 import cn.hikyson.rocket.util.L;
 
 /**
  * Created by kysonchao on 2017/12/27.
  */
 public class TaskScheduer {
-    private List<ConditionTask> mTasks;
+    private List<LaunchTask> mTasks;
 
-    public TaskScheduer(List<ConditionTask> originTasks) {
+    public TaskScheduer(List<LaunchTask> originTasks) {
         mTasks = topologicalSort(originTasks);
-        L.d("解析任务依赖关系，" + String.valueOf(mTasks));
+        L.d("Parsed task dependencies: " + String.valueOf(mTasks));
     }
 
     public void schedule() {
-        for (final ConditionTask conditionTask : mTasks) {
-            conditionTask.runOn().execute(new Runnable() {
+        for (final LaunchTask task : mTasks) {
+            task.runOn().execute(new Runnable() {
                 @Override
                 public void run() {
-                    L.d(conditionTask.taskName() + " 还有" + conditionTask.conditionLeft() + "前置条件");
-                    L.d(conditionTask.taskName() + " 等待条件允许...");
-                    Thread.currentThread().setPriority(conditionTask.priority());
+                    Thread.currentThread().setPriority(task.priority());
+                    L.d(task.taskName() + " waiting " + task.conditionLeft() + " conditions...");
                     long waitTime = System.currentTimeMillis();
-                    long waitThreadTime = SystemClock.currentThreadTimeMillis();
+                    task.beforeWait();
                     try {
-                        conditionTask.waitMetCondition();
+                        task.waitMetCondition();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    L.d(task.taskName() + " conditions met, running...");
                     long runTime = System.currentTimeMillis();
                     long runThreadTime = SystemClock.currentThreadTimeMillis();
-                    L.d(conditionTask.taskName() + " 条件满足，正在run...");
+                    task.beforeRun();
                     try {
-                        conditionTask.run();
+                        task.run();
                     } catch (Throwable throwable) {
                         throwable.printStackTrace();
                     }
-                    conditionTask.onDone();
+                    task.dependencyUnlock();
                     long doneTime = System.currentTimeMillis();
                     long doneThreadTime = SystemClock.currentThreadTimeMillis();
-                    L.d(conditionTask.taskName() + " run done! " + String.valueOf(new TaskTimeRecord(waitTime, waitThreadTime, runTime, runThreadTime, doneTime, doneThreadTime)));
-                    prepareForChildren(conditionTask);
+                    L.d(task.taskName() + " run done! " + String.valueOf(new TaskTimeRecord(waitTime, runTime, runThreadTime, doneTime, doneThreadTime)));
+                    task.onTaskDone();
+                    prepareForChildren(task);
                 }
             });
         }
@@ -57,11 +57,11 @@ public class TaskScheduer {
      *
      * @param selfTask
      */
-    private void prepareForChildren(ConditionTask selfTask) {
-        for (ConditionTask other : mTasks) {
+    private void prepareForChildren(LaunchTask selfTask) {
+        for (LaunchTask other : mTasks) {
             if (other.dependsOn().contains(selfTask.taskName())) {
                 other.conditionPrepare();
-                L.d(selfTask.taskName() + " 为 " + other.taskName() + " 执行countDown ， " + other.taskName() + "距离能够执行还剩" + other.conditionLeft());
+                L.d(selfTask.taskName() + " countdown for " + other.taskName() + ", who has " + other.conditionLeft() + " condition left");
             }
         }
     }
@@ -71,10 +71,10 @@ public class TaskScheduer {
      *
      * @return
      */
-    private synchronized List<ConditionTask> topologicalSort(List<ConditionTask> originTasks) {
+    private synchronized List<LaunchTask> topologicalSort(List<LaunchTask> originTasks) {
         Graph graph = new Graph(originTasks.size());
         for (int i = 0; i < originTasks.size(); i++) {
-            ConditionTask self = originTasks.get(i);
+            LaunchTask self = originTasks.get(i);
             for (String taskName : self.dependsOn()) {
                 int indexOfDepend = getIndexOfTask(originTasks, taskName);
                 if (indexOfDepend < 0) {
@@ -84,7 +84,7 @@ public class TaskScheduer {
             }
         }
         List<Integer> indexOrder = graph.topologicalSort();
-        List<ConditionTask> allTasksSorted = new ArrayList<>();
+        List<LaunchTask> allTasksSorted = new ArrayList<>();
         for (int i : indexOrder) {
             allTasksSorted.add(originTasks.get(i));
         }
@@ -98,7 +98,7 @@ public class TaskScheduer {
      * @param taskName
      * @return
      */
-    private int getIndexOfTask(List<ConditionTask> originTasks, String taskName) {
+    private int getIndexOfTask(List<LaunchTask> originTasks, String taskName) {
         final int size = originTasks.size();
         for (int i = 0; i < size; i++) {
             if (taskName.equals(originTasks.get(i).taskName())) {
@@ -110,13 +110,11 @@ public class TaskScheduer {
 
     private static class TaskTimeRecord {
         private long waitDuration;
-        private long waitThreadDuration;
         private long runDuration;
         private long runThreadDuration;
 
-        public TaskTimeRecord(long waitTime, long waitThreadTime, long runTime, long runThreadTime, long doneTime, long doneThreadTime) {
+        TaskTimeRecord(long waitTime, long runTime, long runThreadTime, long doneTime, long doneThreadTime) {
             waitDuration = runTime - waitTime;
-            waitThreadDuration = runThreadTime - waitThreadTime;
             runDuration = doneTime - runTime;
             runThreadDuration = doneThreadTime - runThreadTime;
         }
@@ -125,11 +123,9 @@ public class TaskScheduer {
         public String toString() {
             return "TaskTimeRecord{" +
                     "waitDuration=" + waitDuration +
-                    "ms, waitThreadDuration=" + waitThreadDuration +
                     "ms, runDuration=" + runDuration +
                     "ms, runThreadDuration=" + runThreadDuration +
                     "ms}";
         }
     }
-
 }

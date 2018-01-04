@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
  * Created by kysonchao on 2018/1/2.
  */
 @Keep
-public abstract class TailTask extends ConditionTask {
+public abstract class TailTask extends LaunchTask {
 
     @NonNull
     @Override

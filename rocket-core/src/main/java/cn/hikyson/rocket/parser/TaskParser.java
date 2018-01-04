@@ -11,16 +11,15 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import cn.hikyson.rocket.task.ConditionTask;
-import cn.hikyson.rocket.util.L;
+import cn.hikyson.rocket.task.LaunchTask;
 
 /**
  * Created by kysonchao on 2017/12/28.
  */
 public class TaskParser {
 
-    public static List<ConditionTask> parse(Context context, String filePath) throws Throwable {
-        List<ConditionTask> taskList = new ArrayList<>();
+    public static List<LaunchTask> parse(Context context, String filePath) throws Throwable {
+        List<LaunchTask> taskList = new ArrayList<>();
         Element root = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(context.getAssets().open(filePath)).getDocumentElement();
         NodeList taskElements = root.getElementsByTagName("task");
         if (taskElements == null || taskElements.getLength() == 0) {
@@ -31,9 +30,9 @@ public class TaskParser {
             String clzName = delegateElement.getTextContent();
             final String taskNameDisplay = delegateElement.getAttribute("name");
             Class<?> clz = Class.forName(clzName);
-            ConditionTask taskInstance = (ConditionTask) clz.newInstance();
+            LaunchTask taskInstance = (LaunchTask) clz.newInstance();
             if (!TextUtils.isEmpty(taskNameDisplay) && !taskNameDisplay.equals(taskInstance.taskName())) {
-                throw new IllegalStateException("task name in assets must same as taskName , or u can just don't declare name field in assets");
+                throw new IllegalStateException("Task name in assets must same as taskName in launchTask class, or u can just don't declare name field in assets");
             }
             taskList.add(taskInstance);
         }

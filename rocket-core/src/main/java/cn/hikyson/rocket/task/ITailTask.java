@@ -8,7 +8,7 @@ import java.util.concurrent.Executor;
 /**
  * Created by kysonchao on 2018/1/3.
  */
-public interface ITailTask {
+public interface ITailTask extends TaskCallback {
     @Nullable
     String taskName();
 
