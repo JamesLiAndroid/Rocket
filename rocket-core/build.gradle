@@ -39,5 +39,6 @@ dependencies {
 }
 
 apply plugin: 'com.github.dcendents.android-maven'
+group = GROUP
 
-group='cn.hikyson.rocket'
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
