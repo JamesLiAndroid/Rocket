@@ -1,0 +1,28 @@
+language: android
+
+android:
+  components:
+    - tools
+    - platform-tools
+    - build-tools-26.0.1
+    - android-26
+    - extra-google-m2repository
+    - extra-android-m2repository
+    - extra-android-support
+
+jdk:
+  - oraclejdk8
+
+before_install:
+    - mkdir "$ANDROID_HOME/licenses" || true
+    - echo -e "8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
+    - echo -e "d56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-license"
+
+sudo: required
+
+script:
+    - ./gradlew clean build
+
+notifications:
+    email:
+        - tech@hikyson.cn
