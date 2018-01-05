@@ -17,7 +17,6 @@ public class SimpleLock {
      * 执行任务
      *
      * @param runnable
-     * @return
      */
     public void execute(final Runnable runnable) {
         mIsReady.set(false);
