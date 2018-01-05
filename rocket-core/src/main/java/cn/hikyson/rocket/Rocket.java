@@ -1,6 +1,6 @@
 package cn.hikyson.rocket;
 
-import android.content.Context;
+import android.app.Application;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
+import cn.hikyson.rocket.helper.DependencyActivityLifecycleCallback;
+import cn.hikyson.rocket.helper.OnCreateAndDependencyParsedCallback;
 import cn.hikyson.rocket.parser.TaskParser;
 import cn.hikyson.rocket.task.ITailTask;
 import cn.hikyson.rocket.task.LaunchTask;
@@ -39,11 +41,11 @@ public class Rocket {
         return InstanceHolder.sInstance;
     }
 
-    public synchronized Rocket from(Context context, String assetFile) throws Throwable {
-        return from(TaskParser.parse(context, assetFile));
+    public synchronized Rocket from(Application application, String assetFile) throws Throwable {
+        return from(application, TaskParser.parse(application, assetFile));
     }
 
-    public synchronized Rocket from(final List<LaunchTask> conditionTasks) {
+    public synchronized Rocket from(Application application, final List<LaunchTask> conditionTasks) {
         mConditionTasks = new ArrayList<>(conditionTasks);
         if (mITailTask != null) {//需要尾部task就添加上去
             mConditionTasks.add(createTailTask(mConditionTasks, mITailTask));
@@ -51,6 +53,12 @@ public class Rocket {
         L.d("Origin task list: " + String.valueOf(mConditionTasks));
         //缓存任务名称和任务的mapping关系
         cacheTaskNameMap();
+        application.registerActivityLifecycleCallbacks(new DependencyActivityLifecycleCallback(new OnCreateAndDependencyParsedCallback() {
+            @Override
+            public void onCreateAndDependencyParsed(@NonNull String[] dependencies) {
+                Rocket.ensureTasks(dependencies);
+            }
+        }));
         return this;
     }
 

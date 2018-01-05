@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
  * Created by kysonchao on 2018/1/2.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ElementType.TYPE})
 public @interface RocketDependency {
+    String[] value();
 }
