@@ -1,12 +1,11 @@
 package cn.hikyson.rocket.sample;
 
-import android.app.Activity;
 import android.os.Bundle;
 
 import cn.hikyson.rocket.helper.RocketDependency;
 
-@RocketDependency({"test1", "test2"})
-public class SecondActivity extends Activity {
+@RocketDependency({"test2"})
+public class SecondActivity extends AbsActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -60,9 +60,12 @@ public class DependencyActivityLifecycleCallback implements Application.Activity
     }
 
     private static String[] parseClassDependencies(Object o) {
-        RocketDependency rocketDependency = o.getClass().getAnnotation(RocketDependency.class);
-        if (rocketDependency != null) {
-            return rocketDependency.value();
+        Class<?> clz = o.getClass();
+        if (clz.isAnnotationPresent(RocketDependency.class)) {
+            RocketDependency rocketDependency = clz.getAnnotation(RocketDependency.class);
+            if (rocketDependency != null) {
+                return rocketDependency.value();
+            }
         }
         return null;
     }
