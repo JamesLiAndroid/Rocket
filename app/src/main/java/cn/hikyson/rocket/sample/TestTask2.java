@@ -26,7 +26,7 @@ public class TestTask2 extends LaunchTask {
     @NonNull
     @Override
     public List<String> dependsOn() {
-        return Collections.emptyList();
+        return Collections.singletonList("test1");
     }
 
     @NonNull
