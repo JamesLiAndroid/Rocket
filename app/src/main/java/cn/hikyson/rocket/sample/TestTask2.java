@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 import cn.hikyson.rocket.task.LaunchTask;
+import cn.hikyson.rocket.util.*;
 
 /**
  * Created by kysonchao on 2017/12/28.
@@ -32,6 +33,6 @@ public class TestTask2 extends LaunchTask {
     @NonNull
     @Override
     public Executor runOn() {
-        return Execs.io;
+        return cn.hikyson.rocket.util.Execs.main();
     }
 }
