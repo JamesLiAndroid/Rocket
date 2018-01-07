@@ -1,5 +1,9 @@
 package cn.hikyson.rocket.task;
 
+import android.os.Looper;
+import android.os.Process;
+import android.support.annotation.NonNull;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -196,6 +200,4 @@ public class TaskScheduerTest {
         }
         Assert.assertTrue(false);
     }
-
-
 }

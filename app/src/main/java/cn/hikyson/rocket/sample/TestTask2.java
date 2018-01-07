@@ -1,5 +1,6 @@
 package cn.hikyson.rocket.sample;
 
+import android.os.Process;
 import android.support.annotation.NonNull;
 
 import java.util.Collections;
@@ -22,6 +23,11 @@ public class TestTask2 extends LaunchTask {
     @Override
     public void run() throws Throwable {
         Thread.sleep(3000);
+    }
+
+    @Override
+    public int priority() {
+        return super.priority() + Process.THREAD_PRIORITY_MORE_FAVORABLE;
     }
 
     @NonNull
