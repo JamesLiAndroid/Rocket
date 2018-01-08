@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
  * Created by kysonchao on 2018/1/2.
  */
 public class Execs {
-    private static Executor sMain = new MainThreadExecutor();
+    private static Executor sMain;
     private static Executor sIo;
     private static Executor sSingle = Executors.newSingleThreadExecutor();
 
@@ -16,5 +16,12 @@ public class Execs {
             sIo = Executors.newCachedThreadPool();
         }
         return sIo;
+    }
+
+    public static Executor main() {
+        if (sMain == null) {
+            sMain = new MainThreadExecutor();
+        }
+        return sMain;
     }
 }

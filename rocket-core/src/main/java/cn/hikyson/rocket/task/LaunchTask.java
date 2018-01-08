@@ -1,5 +1,6 @@
 package cn.hikyson.rocket.task;
 
+import android.os.Process;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
@@ -66,7 +67,7 @@ public abstract class LaunchTask implements Task, Condition, Dependecy, Priority
 
     @Override
     public int priority() {
-        return Thread.NORM_PRIORITY;
+        return Process.THREAD_PRIORITY_BACKGROUND + Process.THREAD_PRIORITY_MORE_FAVORABLE;
     }
 
     @Override
@@ -85,9 +86,10 @@ public abstract class LaunchTask implements Task, Condition, Dependecy, Priority
     public String toString() {
         return "ConditionTask{" +
                 "taskName=" + taskName() +
-                " , depends=" + dependsOn() +
-                " , runOn=" + runOn().getClass().getSimpleName() +
-                " , conditionLeft=" + conditionLeft() +
+                ", priority=" + priority() +
+                ", runOn=" + runOn().getClass().getSimpleName() +
+                ", depends=" + dependsOn() +
+                ", conditionLeft=" + conditionLeft() +
                 '}';
     }
 }

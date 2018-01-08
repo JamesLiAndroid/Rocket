@@ -1,5 +1,7 @@
 package cn.hikyson.rocket.task;
 
+import android.os.AsyncTask;
+import android.os.Process;
 import android.os.SystemClock;
 
 import java.util.ArrayList;
@@ -23,7 +25,7 @@ public class TaskScheduer {
             task.runOn().execute(new Runnable() {
                 @Override
                 public void run() {
-                    Thread.currentThread().setPriority(task.priority());
+                    Process.setThreadPriority(task.priority());
                     L.d(task.taskName() + " waiting " + task.conditionLeft() + " conditions...");
                     long waitTime = System.currentTimeMillis();
                     task.beforeWait();

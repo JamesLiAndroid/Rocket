@@ -1,5 +1,9 @@
 package cn.hikyson.rocket.task;
 
+import android.os.Looper;
+import android.os.Process;
+import android.support.annotation.NonNull;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,14 +28,13 @@ public class TaskScheduerTest {
     @Test
     public void schedule1() throws Exception {
         final Executor executor = Executors.newCachedThreadPool();
-        final CountDownLatch downLatch = new CountDownLatch(4);
+        final CountDownLatch downLatch = new CountDownLatch(2);
         final long[] taskStartTime = {0, 0};
         final long[] taskEndTime = {0, 0};
-        LaunchTask task0 = TaskFactory.create("task0", 1000, new ArrayList<String>(), executor, new TaskCallback() {
+        LaunchTask task0 = TaskFactory.create("task0", 1000, new ArrayList<String>(), executor, new TestTaskCallback() {
             @Override
             public void taskStart() {
                 taskStartTime[0] = System.nanoTime();
-                downLatch.countDown();
             }
 
             @Override
@@ -40,11 +43,10 @@ public class TaskScheduerTest {
                 downLatch.countDown();
             }
         });
-        LaunchTask task1 = TaskFactory.create("task1", 1000, Collections.singletonList("task0"), executor, new TaskCallback() {
+        LaunchTask task1 = TaskFactory.create("task1", 1000, Collections.singletonList("task0"), executor, new TestTaskCallback() {
             @Override
             public void taskStart() {
                 taskStartTime[1] = System.nanoTime();
-                downLatch.countDown();
             }
 
             @Override
@@ -63,14 +65,13 @@ public class TaskScheduerTest {
     @Test
     public void schedule2() throws Exception {
         final Executor executor = Executors.newCachedThreadPool();
-        final CountDownLatch downLatch = new CountDownLatch(6);
+        final CountDownLatch downLatch = new CountDownLatch(3);
         final long[] taskStartTime = {0, 0, 0};
         final long[] taskEndTime = {0, 0, 0};
-        LaunchTask task0 = TaskFactory.create("task0", 1000, new ArrayList<String>(), executor, new TaskCallback() {
+        LaunchTask task0 = TaskFactory.create("task0", 1000, new ArrayList<String>(), executor, new TestTaskCallback() {
             @Override
             public void taskStart() {
                 taskStartTime[0] = System.nanoTime();
-                downLatch.countDown();
             }
 
             @Override
@@ -79,11 +80,10 @@ public class TaskScheduerTest {
                 downLatch.countDown();
             }
         });
-        LaunchTask task1 = TaskFactory.create("task1", 1000, Collections.singletonList("task0"), executor, new TaskCallback() {
+        LaunchTask task1 = TaskFactory.create("task1", 1000, Collections.singletonList("task0"), executor, new TestTaskCallback() {
             @Override
             public void taskStart() {
                 taskStartTime[1] = System.nanoTime();
-                downLatch.countDown();
             }
 
             @Override
@@ -92,11 +92,10 @@ public class TaskScheduerTest {
                 downLatch.countDown();
             }
         });
-        LaunchTask task2 = TaskFactory.create("task2", 1000, Collections.singletonList("task0"), executor, new TaskCallback() {
+        LaunchTask task2 = TaskFactory.create("task2", 1000, Collections.singletonList("task0"), executor, new TestTaskCallback() {
             @Override
             public void taskStart() {
                 taskStartTime[2] = System.nanoTime();
-                downLatch.countDown();
             }
 
             @Override
@@ -115,14 +114,13 @@ public class TaskScheduerTest {
     @Test
     public void schedule3() throws Exception {
         final Executor executor = Executors.newCachedThreadPool();
-        final CountDownLatch downLatch = new CountDownLatch(6);
+        final CountDownLatch downLatch = new CountDownLatch(3);
         final long[] taskStartTime = {0, 0, 0};
         final long[] taskEndTime = {0, 0, 0};
-        LaunchTask task0 = TaskFactory.create("task0", 1000, new ArrayList<String>(), executor, new TaskCallback() {
+        LaunchTask task0 = TaskFactory.create("task0", 1000, new ArrayList<String>(), executor, new TestTaskCallback() {
             @Override
             public void taskStart() {
                 taskStartTime[0] = System.nanoTime();
-                downLatch.countDown();
             }
 
             @Override
@@ -131,11 +129,10 @@ public class TaskScheduerTest {
                 downLatch.countDown();
             }
         });
-        LaunchTask task1 = TaskFactory.create("task1", 1000, Collections.singletonList("task0"), executor, new TaskCallback() {
+        LaunchTask task1 = TaskFactory.create("task1", 1000, Collections.singletonList("task0"), executor, new TestTaskCallback() {
             @Override
             public void taskStart() {
                 taskStartTime[1] = System.nanoTime();
-                downLatch.countDown();
             }
 
             @Override
@@ -144,11 +141,10 @@ public class TaskScheduerTest {
                 downLatch.countDown();
             }
         });
-        LaunchTask task2 = TaskFactory.create("task2", 1000, Arrays.asList("task0", "task1"), executor, new TaskCallback() {
+        LaunchTask task2 = TaskFactory.create("task2", 1000, Arrays.asList("task0", "task1"), executor, new TestTaskCallback() {
             @Override
             public void taskStart() {
                 taskStartTime[2] = System.nanoTime();
-                downLatch.countDown();
             }
 
             @Override
@@ -168,7 +164,7 @@ public class TaskScheduerTest {
     @Test
     public void schedule4() throws Exception {
         final Executor executor = Executors.newCachedThreadPool();
-        LaunchTask task0 = TaskFactory.create("task0", 1000, Collections.singletonList("task2"), executor, new TaskCallback() {
+        LaunchTask task0 = TaskFactory.create("task0", 1000, Collections.singletonList("task2"), executor, new TestTaskCallback() {
             @Override
             public void taskStart() {
             }
@@ -177,7 +173,7 @@ public class TaskScheduerTest {
             public void taskEnd() {
             }
         });
-        LaunchTask task1 = TaskFactory.create("task1", 1000, Collections.singletonList("task0"), executor, new TaskCallback() {
+        LaunchTask task1 = TaskFactory.create("task1", 1000, Collections.singletonList("task0"), executor, new TestTaskCallback() {
             @Override
             public void taskStart() {
             }
@@ -186,7 +182,7 @@ public class TaskScheduerTest {
             public void taskEnd() {
             }
         });
-        LaunchTask task2 = TaskFactory.create("task2", 1000, Collections.singletonList("task1"), executor, new TaskCallback() {
+        LaunchTask task2 = TaskFactory.create("task2", 1000, Collections.singletonList("task1"), executor, new TestTaskCallback() {
             @Override
             public void taskStart() {
             }
@@ -199,11 +195,9 @@ public class TaskScheduerTest {
             new TaskScheduer(Arrays.asList(task2, task1, task0)).schedule();
         } catch (Throwable throwable) {
             Assert.assertTrue(throwable instanceof IllegalStateException);
-            Assert.assertTrue(throwable.getLocalizedMessage().equals("exists a cycle in the graph"));
+            Assert.assertTrue(throwable.getLocalizedMessage().equals("Exists a cycle in the graph"));
             return;
         }
         Assert.assertTrue(false);
     }
-
-
 }

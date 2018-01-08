@@ -1,5 +1,6 @@
 package cn.hikyson.rocket.sample;
 
+import android.os.Process;
 import android.support.annotation.NonNull;
 
 import java.util.Collections;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 import cn.hikyson.rocket.task.LaunchTask;
+import cn.hikyson.rocket.util.*;
 
 /**
  * Created by kysonchao on 2017/12/28.
@@ -23,6 +25,11 @@ public class TestTask2 extends LaunchTask {
         Thread.sleep(3000);
     }
 
+    @Override
+    public int priority() {
+        return super.priority() + Process.THREAD_PRIORITY_MORE_FAVORABLE;
+    }
+
     @NonNull
     @Override
     public List<String> dependsOn() {
@@ -32,6 +39,6 @@ public class TestTask2 extends LaunchTask {
     @NonNull
     @Override
     public Executor runOn() {
-        return Execs.io;
+        return cn.hikyson.rocket.util.Execs.main();
     }
 }
