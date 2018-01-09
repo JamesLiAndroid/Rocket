@@ -22,7 +22,7 @@ public class TestTask2 extends LaunchTask {
 
     @Override
     public void run() throws Throwable {
-        Thread.sleep(3000);
+        Thread.sleep(5000);
     }
 
     @Override
