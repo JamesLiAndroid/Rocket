@@ -1,12 +1,14 @@
 package cn.hikyson.rocket.task;
 
-import android.os.AsyncTask;
 import android.os.Process;
 import android.os.SystemClock;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.hikyson.rocket.exception.IErrorHandler;
+import cn.hikyson.rocket.exception.ITimeoutHandler;
+import cn.hikyson.rocket.monitor.TaskDelayChecker;
 import cn.hikyson.rocket.util.L;
 
 /**
@@ -20,51 +22,73 @@ public class TaskScheduer {
         L.d("Parsed task dependencies: " + String.valueOf(mTasks));
     }
 
-    public void schedule() {
+    public void schedule(final IErrorHandler iErrorHandler, long timeout, ITimeoutHandler iTimeoutHandler) {
         for (final LaunchTask task : mTasks) {
-            task.runOn().execute(new Runnable() {
-                @Override
-                public void run() {
-                    Process.setThreadPriority(task.priority());
-                    L.d(task.taskName() + " waiting " + task.conditionLeft() + " conditions...");
-                    long waitTime = System.currentTimeMillis();
-                    task.beforeWait();
-                    try {
-                        task.waitMetCondition();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    L.d(task.taskName() + " conditions met, running...");
-                    long runTime = System.currentTimeMillis();
-                    long runThreadTime = SystemClock.currentThreadTimeMillis();
-                    task.beforeRun();
-                    try {
-                        task.run();
-                    } catch (Throwable throwable) {
-                        throwable.printStackTrace();
-                    }
-                    task.dependencyUnlock();
-                    long doneTime = System.currentTimeMillis();
-                    long doneThreadTime = SystemClock.currentThreadTimeMillis();
-                    TaskRecord taskRecord = new TaskRecord(waitTime, runTime, runThreadTime, doneTime, doneThreadTime);
-                    L.d(task.taskName() + " run done! " + String.valueOf(taskRecord));
-                    task.onTaskDone(taskRecord);
-                    prepareForChildren(task);
-                }
-            });
+            task.runOn().execute(new Worker(iErrorHandler, task, mTasks));
         }
+        TaskDelayChecker.delayCheckTaskAlive(mTasks, timeout, iTimeoutHandler);
     }
 
     /**
-     * 很多任务依赖当前任务，为这些任务做准备
-     *
-     * @param selfTask
+     * 真正承载任务的worker
      */
-    private void prepareForChildren(LaunchTask selfTask) {
-        for (LaunchTask other : mTasks) {
-            if (other.dependsOn().contains(selfTask.taskName())) {
-                other.conditionPrepare();
-                L.d(selfTask.taskName() + " countdown for " + other.taskName() + ", who has " + other.conditionLeft() + " condition left");
+    private static class Worker implements Runnable {
+        private IErrorHandler iErrorHandler;
+        private LaunchTask task;
+        private List<LaunchTask> mTasks;
+
+        Worker(IErrorHandler iErrorHandler, LaunchTask task, List<LaunchTask> tasks) {
+            this.iErrorHandler = iErrorHandler;
+            this.task = task;
+            this.mTasks = tasks;
+        }
+
+        @Override
+        public void run() {
+            Process.setThreadPriority(task.priority());
+            L.d(task.taskName() + " waiting " + task.conditionLeft() + " conditions...");
+            long waitTime = System.currentTimeMillis();
+            task.beforeWait();
+            try {
+                task.waitMetCondition();
+            } catch (InterruptedException e) {
+                L.e(String.valueOf(e));
+                if (iErrorHandler != null) {
+                    iErrorHandler.onError(task, e);
+                }
+            }
+            L.d(task.taskName() + " conditions met, running...");
+            long runTime = System.currentTimeMillis();
+            long runThreadTime = SystemClock.currentThreadTimeMillis();
+            task.beforeRun();
+            try {
+                task.run();
+            } catch (Throwable e) {
+                L.e(String.valueOf(e));
+                if (iErrorHandler != null) {
+                    iErrorHandler.onError(task, e);
+                }
+            }
+            task.dependencyUnlock();
+            long doneTime = System.currentTimeMillis();
+            long doneThreadTime = SystemClock.currentThreadTimeMillis();
+            TaskRecord taskRecord = new TaskRecord(waitTime, runTime, runThreadTime, doneTime, doneThreadTime);
+            L.d(task.taskName() + " run done! " + String.valueOf(taskRecord));
+            task.onTaskDone(taskRecord);
+            prepareForChildren(task);
+        }
+
+        /**
+         * 很多任务依赖当前任务，为这些任务做准备
+         *
+         * @param selfTask 当前任务
+         */
+        private void prepareForChildren(LaunchTask selfTask) {
+            for (LaunchTask other : mTasks) {
+                if (other.dependsOn().contains(selfTask.taskName())) {
+                    other.conditionPrepare();
+                    L.d(selfTask.taskName() + " countdown for " + other.taskName() + ", who has " + other.conditionLeft() + " condition left");
+                }
             }
         }
     }
@@ -81,7 +105,7 @@ public class TaskScheduer {
             for (String taskName : self.dependsOn()) {
                 int indexOfDepend = getIndexOfTask(originTasks, taskName);
                 if (indexOfDepend < 0) {
-                    throw new IllegalStateException(self.taskName() + "depends on " + taskName + " can not be found in task list");
+                    throw new IllegalStateException(self.taskName() + " depends on " + taskName + " can not be found in task list");
                 }
                 graph.addEdge(indexOfDepend, i);
             }

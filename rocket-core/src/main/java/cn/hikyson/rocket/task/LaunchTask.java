@@ -59,6 +59,16 @@ public abstract class LaunchTask implements Task, Condition, Dependecy, Priority
         mBedependencyLatch.await();
     }
 
+    /**
+     * 当前任务是否已经完成
+     *
+     * @return
+     */
+    @Override
+    public boolean isDone() {
+        return mBedependencyLatch.getCount() == 0;
+    }
+
     @NonNull
     @Override
     public String taskName() {

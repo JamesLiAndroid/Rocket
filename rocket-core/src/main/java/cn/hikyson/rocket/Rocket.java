@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
+import cn.hikyson.rocket.exception.IErrorHandler;
+import cn.hikyson.rocket.exception.ITimeoutHandler;
 import cn.hikyson.rocket.helper.DependencyActivityLifecycleCallback;
 import cn.hikyson.rocket.helper.OnCreateAndDependencyParsedCallback;
 import cn.hikyson.rocket.parser.TaskParser;
@@ -29,6 +31,9 @@ public class Rocket {
     private List<LaunchTask> mConditionTasks;
     private Map<String, LaunchTask> mTaskNameMap;
     private ITailTask mITailTask;
+    private IErrorHandler mIErrorHandler;
+    private ITimeoutHandler mITimeoutHandler;
+    private long mTimeoutMillis;
 
     private Rocket() {
     }
@@ -62,13 +67,6 @@ public class Rocket {
         return this;
     }
 
-    public synchronized void launch() {
-        if (mConditionTasks == null) {
-            throw new IllegalStateException("init task list first");
-        }
-        new TaskScheduer(mConditionTasks).schedule();
-    }
-
     /**
      * 配置尾部task
      *
@@ -78,6 +76,39 @@ public class Rocket {
     public Rocket tailTask(ITailTask iTailTask) {
         this.mITailTask = iTailTask;
         return this;
+    }
+
+    /**
+     * 配置rocket中任务发生的异常
+     *
+     * @param iErrorHandler
+     * @return
+     */
+    public Rocket errorHandler(IErrorHandler iErrorHandler) {
+        this.mIErrorHandler = iErrorHandler;
+        return this;
+    }
+
+    /**
+     * 配置rocket的超时异常
+     *
+     * @param iTimeoutHandler
+     * @return
+     */
+    public Rocket timeoutHandler(long timeoutMillis, ITimeoutHandler iTimeoutHandler) {
+        this.mTimeoutMillis = timeoutMillis;
+        this.mITimeoutHandler = iTimeoutHandler;
+        return this;
+    }
+
+    /**
+     * 开始执行任务
+     */
+    public synchronized void launch() {
+        if (mConditionTasks == null) {
+            throw new IllegalStateException("init task list first");
+        }
+        new TaskScheduer(mConditionTasks).schedule(this.mIErrorHandler, this.mTimeoutMillis, this.mITimeoutHandler);
     }
 
     /**

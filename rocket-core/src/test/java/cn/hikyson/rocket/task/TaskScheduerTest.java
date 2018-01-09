@@ -1,14 +1,9 @@
 package cn.hikyson.rocket.task;
 
-import android.os.Looper;
-import android.os.Process;
-import android.support.annotation.NonNull;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,13 +12,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import cn.hikyson.rocket.BuildConfig;
-
 /**
  * Created by kysonchao on 2017/12/28.
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class)
 public class TaskScheduerTest {
     @Test
     public void schedule1() throws Exception {
@@ -55,7 +47,7 @@ public class TaskScheduerTest {
                 downLatch.countDown();
             }
         });
-        new TaskScheduer(Arrays.<LaunchTask>asList(task0, task1)).schedule();
+        new TaskScheduer(Arrays.<LaunchTask>asList(task0, task1)).schedule(null, 0, null);
         downLatch.await();
         //1 依赖 0
         Assert.assertTrue(taskStartTime[1] > taskEndTime[0]);
@@ -104,7 +96,7 @@ public class TaskScheduerTest {
                 downLatch.countDown();
             }
         });
-        new TaskScheduer(Arrays.asList(task0, task1, task2)).schedule();
+        new TaskScheduer(Arrays.asList(task0, task1, task2)).schedule(null, 0, null);
         downLatch.await();
         //1 依赖 0 ,2 依赖 0
         Assert.assertTrue(taskEndTime[0] < taskStartTime[1]);
@@ -153,7 +145,7 @@ public class TaskScheduerTest {
                 downLatch.countDown();
             }
         });
-        new TaskScheduer(Arrays.asList(task2, task1, task0)).schedule();
+        new TaskScheduer(Arrays.asList(task2, task1, task0)).schedule(null, 0, null);
         downLatch.await();
         //1 依赖 0 ,2 依赖 1 ,2 依赖0
         Assert.assertTrue(taskEndTime[0] < taskStartTime[1]);
@@ -192,7 +184,7 @@ public class TaskScheduerTest {
             }
         });
         try {
-            new TaskScheduer(Arrays.asList(task2, task1, task0)).schedule();
+            new TaskScheduer(Arrays.asList(task2, task1, task0)).schedule(null, 0, null);
         } catch (Throwable throwable) {
             Assert.assertTrue(throwable instanceof IllegalStateException);
             Assert.assertTrue(throwable.getLocalizedMessage().equals("Exists a cycle in the graph"));
@@ -200,4 +192,11 @@ public class TaskScheduerTest {
         }
         Assert.assertTrue(false);
     }
+
+
+    @Test
+    public void schedule5() throws Exception {
+
+    }
+
 }

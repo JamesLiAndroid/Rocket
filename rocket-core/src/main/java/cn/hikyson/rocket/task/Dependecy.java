@@ -7,4 +7,6 @@ public interface Dependecy {
     void dependencyUnlock();
 
     void dependencyWait() throws InterruptedException;
+
+    boolean isDone();
 }
