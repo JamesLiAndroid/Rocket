@@ -1,10 +1,13 @@
 package cn.hikyson.rocket;
 
+import android.app.Activity;
 import android.app.Application;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -60,8 +63,10 @@ public class Rocket {
         cacheTaskNameMap();
         application.registerActivityLifecycleCallbacks(new DependencyActivityLifecycleCallback(new OnCreateAndDependencyParsedCallback() {
             @Override
-            public void onCreateAndDependencyParsed(@NonNull String[] dependencies) {
+            public void onCreateAndDependencyParsed(Activity activity, Bundle savedInstanceState, @NonNull String[] dependencies) {
+                long createdTime = System.currentTimeMillis();
                 Rocket.ensureTasks(dependencies);
+                L.d(activity.getClass().getSimpleName() + " wait dependencies " + Arrays.toString(dependencies) + ", cost " + (System.currentTimeMillis() - createdTime) + " ms");
             }
         }));
         return this;
