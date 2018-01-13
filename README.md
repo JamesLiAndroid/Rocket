@@ -158,4 +158,4 @@ Rocket.get().tailTask(new ITailTask() {
 
 ## 详细说明
 
-[Rocket:如何最大程度且持续地压榨Android-App启动耗时](https://github.com/Kyson/Rocket/blob/master/Rocket-%E5%A6%82%E4%BD%95%E6%9C%80%E5%A4%A7%E7%A8%8B%E5%BA%A6%E4%B8%94%E6%8C%81%E7%BB%AD%E5%9C%B0%E5%8E%8B%E6%A6%A8Android-App%E5%90%AF%E5%8A%A8%E8%80%97%E6%97%B6.md)
+[Rocket-Android启动任务调度框架](https://github.com/Kyson/Rocket/blob/master/Rocket-Android%E5%90%AF%E5%8A%A8%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E6%A1%86%E6%9E%B6.md)
