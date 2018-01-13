@@ -1,6 +1,17 @@
-# Rocket
+<p align="center">
+  <img src="ART/web_hi_res_512.png" width="256" height="256" />
+</p>
 
-Android启动任务调度框架，用于缩短app启动时间
+<h1 align="center">Rocket</h1>
+<p align="center">
+<a href="https://travis-ci.org/Kyson/Rocket" target="_blank"><img src="https://travis-ci.org/Kyson/Rocket.svg?branch=master"></img></a>
+<a href="https://oss.sonatype.org/content/repositories/releases/cn/hikyson/rocket/rocket-core/" target="_blank"><img src="https://img.shields.io/maven-central/v/cn.hikyson.rocket/rocket-core-brightgreen.svg"></img></a>
+<a href="https://jitpack.io/#Kyson/Rocket" target="_blank"><img src="https://jitpack.io/v/Kyson/Rocket.svg"></img></a>
+<a href="LICENSE" target="_blank"><img src="http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat"></img></a>
+</p>
+<br/>
+
+> Android启动任务调度框架，用于缩短app启动时间
 
 ## 快速开始
 
