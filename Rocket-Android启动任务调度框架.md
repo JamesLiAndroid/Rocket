@@ -1,4 +1,4 @@
-# Rocket:如何最大程度且持续地压榨Android-App启动耗时？
+# Rocket-Android启动任务调度框架
 
 > - 本文项目地址：[https://github.com/Kyson/Rocket](https://github.com/Kyson/Rocket)
 > - 相关项目地址：[https://github.com/Kyson/AndroidGodEye](https://github.com/Kyson/AndroidGodEye)
