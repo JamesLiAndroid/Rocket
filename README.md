@@ -5,7 +5,7 @@
 <h1 align="center">Rocket</h1>
 <p align="center">
 <a href="https://travis-ci.org/Kyson/Rocket" target="_blank"><img src="https://travis-ci.org/Kyson/Rocket.svg?branch=master"></img></a>
-<a href="https://oss.sonatype.org/content/repositories/releases/cn/hikyson/rocket/rocket-core/" target="_blank"><img src="https://img.shields.io/maven-central/v/cn.hikyson.rocket/rocket-core-brightgreen.svg"></img></a>
+<a href="https://oss.sonatype.org/content/repositories/releases/cn/hikyson/rocket/rocket-core/" target="_blank"><img src="https://img.shields.io/maven-central/v/cn.hikyson.rocket/rocket-core.svg"></img></a>
 <a href="https://jitpack.io/#Kyson/Rocket" target="_blank"><img src="https://jitpack.io/v/Kyson/Rocket.svg"></img></a>
 <a href="LICENSE" target="_blank"><img src="http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat"></img></a>
 </p>
