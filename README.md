@@ -15,6 +15,16 @@
 
 ## 快速开始
 
+### STEP0
+
+引入依赖，使用gradle
+
+```
+dependencies {
+  implementation 'cn.hikyson.rocket:rocket-core:VERSION_NAME'
+}
+```
+
 ### STEP1
 
 定义某一个任务：
