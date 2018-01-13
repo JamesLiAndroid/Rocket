@@ -122,7 +122,7 @@ A任务非常耗时，同时首页又必须等A任务完成之后才可以进入
 
 ### 问题6:如何接入Rocket,需要注意什么？
 
-接入Rocket:[QuickStart]()
+接入Rocket:[QuickStart](https://github.com/Kyson/Rocket/blob/master/README.md)
 
 需要注意的是，添加的任务应该清楚自己的依赖关系并在dependsOn()接口声明。
 
