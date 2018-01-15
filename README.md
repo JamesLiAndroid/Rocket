@@ -55,7 +55,7 @@ public class TestTask1 extends LaunchTask {
     @NonNull
     @Override
     public Executor runOn() {
-        //执行的线程
+        //执行的线程，默认执行在rocket自带的适合大部分app的线程池中
         return Execs.io;
     }
 
@@ -116,7 +116,6 @@ public class TestTask1 extends LaunchTask {
 
 ### STEP3
 
-
 在application中开始Rocket：
 
 ```
@@ -144,7 +143,13 @@ Rocket.get().tailTask(new ITailTask() {
                 @Override
                 public void onTaskDone(TaskRecord taskRecord) {
                 }
-            }).timeoutHandler(10000, new ITimeoutHandler() {
+            }).tasksFinishCallback(new ITasksFinishCallback() {
+                              @Override
+                              public void onTasksFinished() {
+                                  L.d("onTasksFinished.");
+                              }
+                          })
+            .timeoutHandler(10000, new ITimeoutHandler() {
                 @Override
                 public void onTimeout(List<LaunchTask> timeoutTasks) {
                     L.d("onTimeout: " + String.valueOf(timeoutTasks));
@@ -157,7 +162,8 @@ Rocket.get().tailTask(new ITailTask() {
             }).from(getApplication(), "rocket/task_list.xml").launch();
 ```
 
- - 如果调用了tailTask接口，Rocket会在任务列表结尾添加TailTask任务，如果你希望任务M在所有任务结束之后再执行，那么可以调用这个接口并且声明M任务依赖这个TailTask。
+- tasksFinishCallback接口为所有的任务结束回调
+- 如果调用了tailTask接口，Rocket会在任务列表结尾添加TailTask任务，如果你希望任务M在所有任务结束之后再执行，那么可以调用这个接口并且声明M任务依赖这个TailTask。
 - timeoutHandler用于超时回调，Rocket会检测所有的任务执行状态，如果达到了超时时间且部分任务没有完成就会回调这个方法，并返回未完成的任务列表
 - errorHandler用于错误回调，如果有些任务发生异常则回调此方法
 - from接口声明Rocket从哪里读取任务列表，比如读取STEP2创建的assets目录下的任务列表文件
