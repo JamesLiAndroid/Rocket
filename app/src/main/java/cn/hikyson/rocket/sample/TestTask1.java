@@ -25,7 +25,7 @@ public class TestTask1 extends LaunchTask {
     @Override
     public void run() throws Throwable {
         //执行的任务
-        Thread.sleep(6000);
+        Thread.sleep(2000);
     }
 
     @NonNull

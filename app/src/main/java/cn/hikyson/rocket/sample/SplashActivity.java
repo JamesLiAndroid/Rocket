@@ -11,8 +11,9 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 import cn.hikyson.rocket.Rocket;
-import cn.hikyson.rocket.exception.IErrorHandler;
-import cn.hikyson.rocket.exception.ITimeoutHandler;
+import cn.hikyson.rocket.callback.IErrorHandler;
+import cn.hikyson.rocket.callback.ITasksFinishCallback;
+import cn.hikyson.rocket.callback.ITimeoutHandler;
 import cn.hikyson.rocket.task.ITailTask;
 import cn.hikyson.rocket.task.LaunchTask;
 import cn.hikyson.rocket.task.TailTask;
@@ -50,6 +51,11 @@ public class SplashActivity extends Activity {
 
                 @Override
                 public void onTaskDone(TaskRecord taskRecord) {
+                }
+            }).tasksFinishCallback(new ITasksFinishCallback() {
+                @Override
+                public void onTasksFinished() {
+                    L.d("onTasksFinished.");
                 }
             }).timeoutHandler(10000, new ITimeoutHandler() {
                 @Override

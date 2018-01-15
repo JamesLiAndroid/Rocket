@@ -14,8 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
-import cn.hikyson.rocket.exception.IErrorHandler;
-import cn.hikyson.rocket.exception.ITimeoutHandler;
+import cn.hikyson.rocket.callback.IErrorHandler;
+import cn.hikyson.rocket.callback.ITasksFinishCallback;
+import cn.hikyson.rocket.callback.ITimeoutHandler;
 import cn.hikyson.rocket.helper.DependencyActivityLifecycleCallback;
 import cn.hikyson.rocket.helper.OnCreateAndDependencyParsedCallback;
 import cn.hikyson.rocket.parser.TaskParser;
@@ -36,6 +37,7 @@ public class Rocket {
     private ITailTask mITailTask;
     private IErrorHandler mIErrorHandler;
     private ITimeoutHandler mITimeoutHandler;
+    private ITasksFinishCallback mITasksFinishCallback;
     private long mTimeoutMillis;
 
     private Rocket() {
@@ -84,13 +86,13 @@ public class Rocket {
     }
 
     /**
-     * 配置rocket中任务发生的异常
+     * 所有任务完成的回调
      *
-     * @param iErrorHandler
+     * @param ITasksFinishCallback
      * @return
      */
-    public Rocket errorHandler(IErrorHandler iErrorHandler) {
-        this.mIErrorHandler = iErrorHandler;
+    public Rocket tasksFinishCallback(ITasksFinishCallback ITasksFinishCallback) {
+        this.mITasksFinishCallback = ITasksFinishCallback;
         return this;
     }
 
@@ -106,6 +108,11 @@ public class Rocket {
         return this;
     }
 
+    public Rocket errorHandler(IErrorHandler iErrorHandler) {
+        this.mIErrorHandler = iErrorHandler;
+        return this;
+    }
+
     /**
      * 开始执行任务
      */
@@ -113,7 +120,7 @@ public class Rocket {
         if (mConditionTasks == null) {
             throw new IllegalStateException("init task list first");
         }
-        new TaskScheduer(mConditionTasks).schedule(this.mIErrorHandler, this.mTimeoutMillis, this.mITimeoutHandler);
+        new TaskScheduer(mConditionTasks).schedule(this.mIErrorHandler, this.mTimeoutMillis, this.mITimeoutHandler, this.mITasksFinishCallback);
     }
 
     /**

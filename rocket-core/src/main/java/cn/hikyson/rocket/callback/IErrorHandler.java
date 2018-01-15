@@ -1,4 +1,4 @@
-package cn.hikyson.rocket.exception;
+package cn.hikyson.rocket.callback;
 
 import cn.hikyson.rocket.task.LaunchTask;
 
