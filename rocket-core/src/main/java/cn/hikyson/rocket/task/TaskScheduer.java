@@ -2,12 +2,15 @@ package cn.hikyson.rocket.task;
 
 import android.os.Process;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import cn.hikyson.rocket.exception.IErrorHandler;
-import cn.hikyson.rocket.exception.ITimeoutHandler;
+import cn.hikyson.rocket.callback.IErrorHandler;
+import cn.hikyson.rocket.callback.ITasksFinishCallback;
+import cn.hikyson.rocket.callback.ITimeoutHandler;
 import cn.hikyson.rocket.monitor.TaskDelayChecker;
 import cn.hikyson.rocket.util.L;
 
@@ -22,9 +25,18 @@ public class TaskScheduer {
         L.d("Parsed task dependencies: " + String.valueOf(mTasks));
     }
 
-    public void schedule(final IErrorHandler iErrorHandler, long timeout, ITimeoutHandler iTimeoutHandler) {
+    public void schedule(final IErrorHandler iErrorHandler, long timeout, ITimeoutHandler iTimeoutHandler, final ITasksFinishCallback iTasksFinishCallback) {
+        final AtomicInteger taskDoneCounter = new AtomicInteger(0);
+        final int taskCount = mTasks.size();
         for (final LaunchTask task : mTasks) {
-            task.runOn().execute(new Worker(iErrorHandler, task, mTasks));
+            task.runOn().execute(new Worker(iErrorHandler, task, mTasks, new Worker.TaskDoneCallback() {
+                @Override
+                public void onTaskDone() {
+                    if (taskDoneCounter.addAndGet(1) == taskCount && iTasksFinishCallback != null) {
+                        iTasksFinishCallback.onTasksFinished();
+                    }
+                }
+            }));
         }
         TaskDelayChecker.delayCheckTaskAlive(mTasks, timeout, iTimeoutHandler);
     }
@@ -36,9 +48,11 @@ public class TaskScheduer {
         private IErrorHandler iErrorHandler;
         private LaunchTask task;
         private List<LaunchTask> mTasks;
+        private TaskDoneCallback mTaskDoneCallback;
 
-        Worker(IErrorHandler iErrorHandler, LaunchTask task, List<LaunchTask> tasks) {
+        Worker(IErrorHandler iErrorHandler, LaunchTask task, List<LaunchTask> tasks, @NonNull TaskDoneCallback taskDoneCallback) {
             this.iErrorHandler = iErrorHandler;
+            this.mTaskDoneCallback = taskDoneCallback;
             this.task = task;
             this.mTasks = tasks;
         }
@@ -76,6 +90,7 @@ public class TaskScheduer {
             L.d(task.taskName() + " run done! " + String.valueOf(taskRecord));
             task.onTaskDone(taskRecord);
             prepareForChildren(task);
+            mTaskDoneCallback.onTaskDone();
         }
 
         /**
@@ -90,6 +105,10 @@ public class TaskScheduer {
                     L.d(selfTask.taskName() + " countdown for " + other.taskName() + ", who has " + other.conditionLeft() + " condition left");
                 }
             }
+        }
+
+        private interface TaskDoneCallback {
+            void onTaskDone();
         }
     }
 

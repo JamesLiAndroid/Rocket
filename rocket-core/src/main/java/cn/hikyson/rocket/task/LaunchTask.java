@@ -5,6 +5,9 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
+
+import cn.hikyson.rocket.util.Execs;
 
 /**
  * Created by kysonchao on 2017/12/26.
@@ -78,6 +81,12 @@ public abstract class LaunchTask implements Task, Condition, Dependecy, Priority
     @Override
     public int priority() {
         return Process.THREAD_PRIORITY_BACKGROUND + Process.THREAD_PRIORITY_MORE_FAVORABLE;
+    }
+
+    @NonNull
+    @Override
+    public Executor runOn() {
+        return Execs.launchExecutor();
     }
 
     @Override

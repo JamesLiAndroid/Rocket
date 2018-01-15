@@ -92,7 +92,14 @@ public class TestTask1 extends LaunchTask {
 
 ### STEP2
 
-注册任务，在应用assets目录下创建任务列表的xml格式文件，文件根节点为task-list，任务节点名为task，比如在assets下创建rocket文件夹，并在此创建task_list.xml文件，文件内容为：
+**所有API均由Rocket类提供**
+
+注册任务有两种方式：
+
+1. `public synchronized Rocket from(Application application, final List<LaunchTask> conditionTasks)`接口直接传入直接定义的任务列表
+2. `public synchronized Rocket from(Application application, String assetFile)`，从assets文件中实例化任务列表，具体方式：
+
+在应用assets目录下创建任务列表的xml格式文件，文件根节点为task-list，任务节点名为task，比如在assets下创建rocket文件夹，并在此创建task_list.xml文件，文件内容为：
 
 ```
 <?xml version="1.0" encoding="utf-8"?>
@@ -155,6 +162,19 @@ Rocket.get().tailTask(new ITailTask() {
 - errorHandler用于错误回调，如果有些任务发生异常则回调此方法
 - from接口声明Rocket从哪里读取任务列表，比如读取STEP2创建的assets目录下的任务列表文件
 - 最后调用launch开始执行任务
+
+### STEP4
+
+如果首页需要等待某几个必要任务执行完毕才能开始使用，可以使用`public static void ensureTasks(String... taskNames)`接口，这个接口后的代码会一直等待直到任务完成才能执行。
+
+更便捷的做法：在Activity上声明`RocketDependency`注解
+
+```
+//页面依赖test2的任务
+@RocketDependency({"test2"})
+public class SecondActivity extends AbsActivity {
+}
+```
 
 ## 详细说明
 
